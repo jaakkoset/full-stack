@@ -1,1 +1,1 @@
-# fullstack -kurssin palautusrepositorio
+# Full Stack -kurssin palautusrepositorio
