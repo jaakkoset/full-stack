@@ -31,7 +31,7 @@ const App = () => {
   const addPerson = (event) => {
     /** Adds a person after the user clicks the "add" button. */
     event.preventDefault();
-    console.log("button clicked", event.target);
+    console.log("button 'add' clicked");
     const personObject = {
       name: newName,
       number: newNumber,
@@ -41,11 +41,16 @@ const App = () => {
       console.log("Name found!!!");
       alert(`${newName} is already added to phonebook`);
     } else {
+      axios
+        .post("http://localhost:3001/persons", personObject)
+        .then((response) => {
+          console.log(`response: ${response}`);
+        });
       setPersons(persons.concat(personObject));
       setNewName("");
       setNewNumber("");
 
-      // Show all persons after adding one
+      // Show all persons after adding a new one
       setNewFilter("");
       setFilteredPersons(persons.concat(personObject));
     }
