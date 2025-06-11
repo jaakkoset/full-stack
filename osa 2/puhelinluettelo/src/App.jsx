@@ -3,23 +3,21 @@ import axios from "axios";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
+import numberService from "./services/Numbers";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [filteredPersons, setFilteredPersons] = useState(persons);
-  const [newName, setNewName] = useState("Add a new name...");
-  const [newNumber, setNewNumber] = useState("Add a new number...");
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
 
   useEffect(
     () => {
       console.log("effect");
-      axios.get("http://localhost:3001/persons").then((response) => {
-        console.log("Promise fulfilled. Response:", response);
-        // Persons received from the database
-        const receivedPersons = response.data;
-        setPersons(receivedPersons);
-        setFilteredPersons(receivedPersons);
+      numberService.getAll().then((fetchedPersons) => {
+        setPersons(fetchedPersons);
+        setFilteredPersons(fetchedPersons);
       });
     },
     // The second argument is an empty list, because we want to trigger the effect only
@@ -41,18 +39,19 @@ const App = () => {
       console.log("Name found!!!");
       alert(`${newName} is already added to phonebook`);
     } else {
-      axios
-        .post("http://localhost:3001/persons", personObject)
-        .then((response) => {
-          console.log(`response: ${response}`);
-        });
-      setPersons(persons.concat(personObject));
-      setNewName("");
-      setNewNumber("");
-
-      // Show all persons after adding a new one
-      setNewFilter("");
-      setFilteredPersons(persons.concat(personObject));
+      numberService.create(personObject).then((returnedPerson) => {
+        console.log(
+          "A person added to database. Returned person object:",
+          returnedPerson
+        );
+        const allPersons = persons.concat(returnedPerson);
+        setPersons(allPersons);
+        setNewName("");
+        setNewNumber("");
+        // Show all persons after adding a new one
+        setNewFilter("");
+        setFilteredPersons(allPersons);
+      });
     }
   };
 
