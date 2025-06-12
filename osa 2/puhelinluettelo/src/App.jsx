@@ -14,7 +14,6 @@ const App = () => {
 
   useEffect(
     () => {
-      console.log("effect");
       numberService.getAll().then((fetchedPersons) => {
         setPersons(fetchedPersons);
         setFilteredPersons(fetchedPersons);
@@ -24,7 +23,6 @@ const App = () => {
     // after the first render
     []
   );
-  console.log("render", persons.length, "persons");
 
   const addPerson = (event) => {
     /** Adds a person after the user clicks the "add" button. */
@@ -100,19 +98,37 @@ const App = () => {
     };
 
     if (filter) {
+      // User has given a flter
       console.log("Filter was truthy:", filter);
       const personsAfterFilter = persons.filter((person) =>
         checkPerson(person.name)
       );
       setFilteredPersons(personsAfterFilter);
     } else {
+      // Filter is an empty character. Show all persons.
       console.log("Filter was falsy:", filter);
       setFilteredPersons(persons);
     }
   };
 
-  console.log("persons:", persons);
-  console.log("filtered persons:", filteredPersons);
+  const removePerson = (personId, personName) => {
+    /** Delete person from database */
+    if (window.confirm(`Delete ${personName}?`)) {
+      numberService.remove(personId).then((removedPerson) => {
+        console.log("Person removed", removedPerson);
+        const remainingPersons = persons.filter(
+          (person) => person.id !== removedPerson.id
+        );
+        setPersons(remainingPersons);
+        setFilteredPersons(remainingPersons);
+      });
+    } else {
+      console.log("Nothing deleted");
+    }
+  };
+
+  console.log(persons.length, "persons");
+  console.log(filteredPersons.length, "filtered persons");
   return (
     <div>
       <h2>Phonebook</h2>
@@ -126,7 +142,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} remove={removePerson} />
     </div>
   );
 };
