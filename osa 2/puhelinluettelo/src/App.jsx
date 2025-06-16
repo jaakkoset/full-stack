@@ -25,7 +25,8 @@ const App = () => {
   );
 
   const addPerson = (event) => {
-    /** Adds a person after the user clicks the "add" button. */
+    /** Adds a person after the user clicks the "add" button. If a person with the given name
+     * already exists, asks the user whether he wants to update the number. */
     event.preventDefault();
     console.log("button 'add' clicked");
     const personObject = {
@@ -33,9 +34,32 @@ const App = () => {
       number: newNumber,
     };
 
-    if (persons.find(({ name }) => name === personObject.name)) {
+    // Check whether the person is already added to the phonebook
+    const personExists = persons.find(({ name }) => name === personObject.name);
+    console.log("personExists", personExists);
+    if (personExists) {
       console.log("Name found!!!");
-      alert(`${newName} is already added to phonebook`);
+      // Check whether the user wants to update the number of the existing person
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook. Replace the old number with the new one?`
+        )
+      ) {
+        console.log("update number");
+        // Change the number but keep the name in the database
+        const personId = personExists.id;
+        numberService.update(personId, personObject).then((returnedPerson) => {
+          // Update the list of persons
+          const updatedPersons = persons.map((person) =>
+            person.id !== returnedPerson.id ? person : returnedPerson
+          );
+          // Update what is rendered
+          setPersons(updatedPersons);
+          setFilteredPersons(updatedPersons);
+        });
+      } else {
+        console.log("Number not updated");
+      }
     } else {
       numberService.create(personObject).then((returnedPerson) => {
         console.log(
@@ -78,7 +102,7 @@ const App = () => {
     /**
      * Filters the names of persons based on `filter`, when `filter` is truthy, and sets
      * the `filteredPersons` using the `setFilteredPersons` functions. If
-     * `filter` is falsy (empty string), sets all persons to `filteredPersons`.
+     * `filter` is falsy (empty string), sets `filteredPersons` to be all persons.
      *
      * Returns:
      *  None

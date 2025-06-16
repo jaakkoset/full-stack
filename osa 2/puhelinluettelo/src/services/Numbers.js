@@ -11,9 +11,16 @@ const create = (newObject) => {
   return request.then((response) => response.data);
 };
 
-const remove = (objectId) => {
-  const url = `${baseUrl}/${objectId}`;
+const remove = (personId) => {
+  const url = `${baseUrl}/${personId}`;
   const request = axios.delete(url);
+  return request.then((response) => response.data);
+};
+
+const update = (personId, updatedPerson) => {
+  const url = `${baseUrl}/${personId}`;
+  console.log("url", url);
+  const request = axios.put(url, updatedPerson);
   return request.then((response) => response.data);
 };
 
@@ -21,4 +28,5 @@ export default {
   getAll: getAll,
   create: create,
   remove: remove,
+  update: update,
 };
