@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
 import numberService from "./services/Numbers";
+import Success from "./components/Success";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,6 +11,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(
     () => {
@@ -56,6 +57,10 @@ const App = () => {
           // Update what is rendered
           setPersons(updatedPersons);
           setFilteredPersons(updatedPersons);
+          setNewFilter("");
+          setNewName("");
+          setNewNumber("");
+          displaySuccessMessage(`Updated the number of ${returnedPerson.name}`);
         });
       } else {
         console.log("Number not updated");
@@ -73,8 +78,17 @@ const App = () => {
         // Show all persons after adding a new one
         setNewFilter("");
         setFilteredPersons(allPersons);
+        displaySuccessMessage(`Added ${returnedPerson.name}`);
       });
     }
+  };
+
+  const displaySuccessMessage = (message) => {
+    // Display a succcess message and remove it after time out
+    setSuccessMessage(message);
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 5000);
   };
 
   const handleNameChange = (event) => {
@@ -145,6 +159,7 @@ const App = () => {
         );
         setPersons(remainingPersons);
         setFilteredPersons(remainingPersons);
+        displaySuccessMessage(`Deleted ${removedPerson.name}`);
       });
     } else {
       console.log("Nothing deleted");
@@ -156,6 +171,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Success message={successMessage} />
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
       <h2>Add a new name</h2>
       <PersonForm
