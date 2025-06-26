@@ -3,7 +3,7 @@ import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
 import numberService from "./services/Numbers";
-import Success from "./components/Success";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,7 +11,8 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
-  const [successMessage, setSuccessMessage] = useState(null);
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [notificationType, setNotificationType] = useState(null);
 
   useEffect(
     () => {
@@ -84,10 +85,13 @@ const App = () => {
   };
 
   const displaySuccessMessage = (message) => {
-    // Display a succcess message and remove it after time out
-    setSuccessMessage(message);
+    /** Display a notification message and remove it after time out. `message is the
+     * text displayed and `type` determines the style of the notification. */
+    setNotificationMessage(message);
+    setNotificationType("success");
     setTimeout(() => {
-      setSuccessMessage(null);
+      setNotificationMessage(null);
+      setNotificationType(null);
     }, 5000);
   };
 
@@ -171,7 +175,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Success message={successMessage} />
+      <Notification message={notificationMessage} type={notificationType} />
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
       <h2>Add a new name</h2>
       <PersonForm
