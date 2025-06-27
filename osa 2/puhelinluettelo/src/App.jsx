@@ -50,38 +50,47 @@ const App = () => {
         console.log("update number");
         // Change the number but keep the name in the database
         const personId = personExists.id;
-        numberService.update(personId, personObject).then((returnedPerson) => {
-          // Update the list of persons
-          const updatedPersons = persons.map((person) =>
-            person.id !== returnedPerson.id ? person : returnedPerson
-          );
-          // Update what is rendered
-          setPersons(updatedPersons);
-          setFilteredPersons(updatedPersons);
-          setNewFilter("");
-          setNewName("");
-          setNewNumber("");
-          displayNotification(
-            `Updated the number of ${returnedPerson.name}`,
-            "success"
-          );
-        });
+        numberService
+          .update(personId, personObject)
+          .then((returnedPerson) => {
+            // Update the list of persons
+            const updatedPersons = persons.map((person) =>
+              person.id !== returnedPerson.id ? person : returnedPerson
+            );
+            // Update what is rendered
+            resetApplication(updatedPersons);
+            displayNotification(
+              `Updated the number of ${returnedPerson.name}`,
+              "success"
+            );
+          })
+          .catch((error) => {
+            // Display error message
+            displayNotification(
+              `Information of ${newName} has already been removed from server`,
+              "error"
+            );
+            // Remove the missing person from the list of persons
+            const updatedPersons = persons.filter(
+              (person) => person.id !== personId
+            );
+            resetApplication(updatedPersons);
+          });
       } else {
+        // User did not want to update the number. Do nothing.
         console.log("Number not updated");
       }
     } else {
+      // Add a new person to database
       numberService.create(personObject).then((returnedPerson) => {
         console.log(
           "A person added to database. Returned person object:",
           returnedPerson
         );
         const allPersons = persons.concat(returnedPerson);
-        setPersons(allPersons);
-        setNewName("");
-        setNewNumber("");
-        // Show all persons after adding a new one
-        setNewFilter("");
-        setFilteredPersons(allPersons);
+        // Update what is rendered
+        resetApplication(allPersons);
+        // Display a success notification
         displayNotification(`Added ${returnedPerson.name}`, "success");
       });
     }
@@ -159,19 +168,30 @@ const App = () => {
   const removePerson = (personId, personName) => {
     /** Delete person from database */
     if (window.confirm(`Delete ${personName}?`)) {
+      // User wants to delete the person
       numberService.remove(personId).then((removedPerson) => {
         console.log("Person removed", removedPerson);
         const remainingPersons = persons.filter(
           (person) => person.id !== removedPerson.id
         );
-        setPersons(remainingPersons);
-        setFilteredPersons(remainingPersons);
-        setNewFilter("");
+        resetApplication(remainingPersons);
         displayNotification(`Deleted ${removedPerson.name}`, "success");
       });
     } else {
+      // User does not want to delete the person. Do nothing.
       console.log("Nothing deleted");
     }
+  };
+
+  const resetApplication = (updatedListOfPersons) => {
+    /* Resets what the user sees. Deletes text from all text fields and updates the
+    persons. `updatedListOfPersons` is the list of persons that will be shown to the 
+    user. **/
+    setPersons(updatedListOfPersons);
+    setFilteredPersons(updatedListOfPersons);
+    setNewFilter("");
+    setNewName("");
+    setNewNumber("");
   };
 
   console.log(persons.length, "persons");
