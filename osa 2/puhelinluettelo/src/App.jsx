@@ -26,9 +26,9 @@ const App = () => {
     []
   );
 
+  /** Adds a person after the user clicks the "add" button. If a person with the given name
+   * already exists, asks the user whether he wants to update the number. */
   const addPerson = (event) => {
-    /** Adds a person after the user clicks the "add" button. If a person with the given name
-     * already exists, asks the user whether he wants to update the number. */
     event.preventDefault();
     console.log("button 'add' clicked");
     const personObject = {
@@ -67,7 +67,7 @@ const App = () => {
           .catch((error) => {
             // Display error message
             displayNotification(
-              `Information of ${newName} has already been removed from server`,
+              `Information of ${newName} was already removed from server`,
               "error"
             );
             // Remove the missing person from the list of persons
@@ -110,20 +110,20 @@ const App = () => {
     }, 5000);
   };
 
+  /** Handle the event when the user types something into the name field */
   const handleNameChange = (event) => {
-    /** Handle the event when the user types something into the name field */
     console.log(event.target.value);
     setNewName(event.target.value);
   };
 
+  /** Handle the event when the user types something into the number field */
   const handleNumberChange = (event) => {
-    /** Handle the event when the user types something into the number field */
     console.log(event.target.value);
     setNewNumber(event.target.value);
   };
 
+  /** Handle the event when the user types something into the filter field */
   const handleFilterChange = (event) => {
-    /** Handle the event when the user types something into the filter field */
     const currentFilter = event.target.value;
     console.log("currentFilter:", currentFilter);
     setNewFilter(currentFilter);
@@ -131,24 +131,22 @@ const App = () => {
     filterPersons(currentFilter);
   };
 
+  /**
+   * Filters the names of persons based on `filter`, when `filter` is truthy, and
+   * updates the state hook `filteredPersons`. If `filter` is falsy (an empty string),
+   * includes all persons to `filteredPersons`.
+   *
+   * @param {string} filter - Text that user has typed into the filter text field.
+   * @returns None:
+   */
   const filterPersons = (filter) => {
     /**
-     * Filters the names of persons based on `filter`, when `filter` is truthy, and sets
-     * the `filteredPersons` using the `setFilteredPersons` functions. If
-     * `filter` is falsy (empty string), sets `filteredPersons` to be all persons.
+     * Checks whether the filter matches a substring in a persons name.
      *
-     * Returns:
-     *  None
+     * @returns {boolean} `True` if the lowercase name of a person includes the lowercase
+     * filter and `False` otherwise.
      */
     const checkPerson = (person) => {
-      /**
-       * Checks whether the filter matches a substring in a perons name.
-       *
-       * Return:
-       *  bool:
-       *    true: if the lowercase name of a person includes the lowercase filter.
-       *    false: otherwise.
-       */
       const lowerCasePerson = person.toLowerCase();
       const lowerCaseFilter = filter.toLowerCase();
       return lowerCasePerson.includes(lowerCaseFilter);
@@ -168,8 +166,8 @@ const App = () => {
     }
   };
 
+  /** Delete person from database */
   const removePerson = (personId, personName) => {
-    /** Delete person from database */
     if (window.confirm(`Delete ${personName}?`)) {
       // User wants to delete the person
       numberService
@@ -199,10 +197,11 @@ const App = () => {
     }
   };
 
+  /** Resets what the user sees. Deletes text from all text fields and updates the
+   * persons.
+   * @param {Array} updatedListOfPersons- The is the list of persons that will be shown to the user.
+   * @returns None*/
   const resetApplication = (updatedListOfPersons) => {
-    /* Resets what the user sees. Deletes text from all text fields and updates the
-    persons. `updatedListOfPersons` is the list of persons that will be shown to the 
-    user. **/
     setPersons(updatedListOfPersons);
     setFilteredPersons(updatedListOfPersons);
     setNewFilter("");
