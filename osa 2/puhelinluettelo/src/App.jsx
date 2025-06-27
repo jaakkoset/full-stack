@@ -96,9 +96,12 @@ const App = () => {
     }
   };
 
+  /** Display a notification message and remove it after time out.
+   * @param {string} message - The text displayed to the user.
+   * @param {string} type - `success` or `error`. Determines the style of the notification.
+   * @returns None
+   */
   const displayNotification = (message, type) => {
-    /** Display a notification message and remove it after time out. `message` is the
-     * text displayed and the notification type determines the style of the notification. */
     setNotificationMessage(message);
     setNotificationType(type);
     setTimeout(() => {
@@ -169,14 +172,27 @@ const App = () => {
     /** Delete person from database */
     if (window.confirm(`Delete ${personName}?`)) {
       // User wants to delete the person
-      numberService.remove(personId).then((removedPerson) => {
-        console.log("Person removed", removedPerson);
-        const remainingPersons = persons.filter(
-          (person) => person.id !== removedPerson.id
-        );
-        resetApplication(remainingPersons);
-        displayNotification(`Deleted ${removedPerson.name}`, "success");
-      });
+      numberService
+        .remove(personId)
+        .then((removedPerson) => {
+          console.log("Person removed", removedPerson);
+          const remainingPersons = persons.filter(
+            (person) => person.id !== removedPerson.id
+          );
+          resetApplication(remainingPersons);
+          displayNotification(`Deleted ${removedPerson.name}`, "success");
+        })
+        .catch((error) => {
+          // Deletion failed. The person had probably already been deleted.
+          const remainingPersons = persons.filter(
+            (person) => person.id !== personId
+          );
+          resetApplication(remainingPersons);
+          displayNotification(
+            `${personName} had already been deleted from the server`,
+            "error"
+          );
+        });
     } else {
       // User does not want to delete the person. Do nothing.
       console.log("Nothing deleted");
