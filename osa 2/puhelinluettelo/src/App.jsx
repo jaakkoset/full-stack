@@ -61,7 +61,10 @@ const App = () => {
           setNewFilter("");
           setNewName("");
           setNewNumber("");
-          displaySuccessMessage(`Updated the number of ${returnedPerson.name}`);
+          displayNotification(
+            `Updated the number of ${returnedPerson.name}`,
+            "success"
+          );
         });
       } else {
         console.log("Number not updated");
@@ -79,16 +82,16 @@ const App = () => {
         // Show all persons after adding a new one
         setNewFilter("");
         setFilteredPersons(allPersons);
-        displaySuccessMessage(`Added ${returnedPerson.name}`);
+        displayNotification(`Added ${returnedPerson.name}`, "success");
       });
     }
   };
 
-  const displaySuccessMessage = (message) => {
-    /** Display a notification message and remove it after time out. `message is the
-     * text displayed and `type` determines the style of the notification. */
+  const displayNotification = (message, type) => {
+    /** Display a notification message and remove it after time out. `message` is the
+     * text displayed and the notification type determines the style of the notification. */
     setNotificationMessage(message);
-    setNotificationType("success");
+    setNotificationType(type);
     setTimeout(() => {
       setNotificationMessage(null);
       setNotificationType(null);
@@ -163,7 +166,8 @@ const App = () => {
         );
         setPersons(remainingPersons);
         setFilteredPersons(remainingPersons);
-        displaySuccessMessage(`Deleted ${removedPerson.name}`);
+        setNewFilter("");
+        displayNotification(`Deleted ${removedPerson.name}`, "success");
       });
     } else {
       console.log("Nothing deleted");
