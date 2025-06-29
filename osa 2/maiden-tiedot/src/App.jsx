@@ -3,5 +3,4 @@ const App = () => (
     <p>Tästä tulee sääsovellus</p>
   </div>
 );
-
 export default App;
