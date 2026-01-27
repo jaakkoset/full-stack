@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import getWeather from "./services/weather";
 
 /** Component for rendering the countries. This component either renders a list of
  * countries, information about a single country, a text indicating that no matches
@@ -40,6 +41,41 @@ const CountryInfo = ({ country }) => {
           width="200"
         />
       }
+      <Weather city={country.capital[0]} />
+    </div>
+  );
+};
+
+/** Component for showing the weather in a city */
+const Weather = ({ city }) => {
+  // Format `weather` with fake data so that the page can be rendered before
+  // the real data arrives
+  const [weather, setWeather] = useState({
+    temperature: "?",
+    wind: "?",
+    city: null,
+    icon: "?",
+  });
+
+  useEffect(() => {
+    getWeather(city).then(weather => {
+      setWeather(weather);
+    });
+  }, [city]);
+
+  console.log("weather", weather);
+
+  return (
+    <div>
+      <h2>Weather in {city}</h2>
+      Temperature {weather.temperature} Celsius
+      <br />
+      <img
+        src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+        alt="Loading picture..."
+      />
+      <br />
+      Wind {weather.wind} m/s
     </div>
   );
 };
