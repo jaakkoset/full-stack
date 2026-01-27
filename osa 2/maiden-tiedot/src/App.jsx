@@ -2,15 +2,19 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 /** Component for rendering the countries. This component either renders a list of
- * countries, information about a single country, a text indicating tha no matches
+ * countries, information about a single country, a text indicating that no matches
  * were found, or a text indicating that more than ten matches were found.  */
-const Countries = ({ listOfCountries }) => {
+const Countries = ({ listOfCountries, showOneCountry }) => {
   if (listOfCountries.length === 0) {
     return <p>No countries found.</p>;
   } else if (listOfCountries.length === 1) {
     return <CountryInfo country={listOfCountries[0]} />;
   } else if (listOfCountries.length <= 10) {
-    return listOfCountries.map((c) => <p key={c.name}>{c.name}</p>);
+    return listOfCountries.map(c => (
+      <p key={c.name}>
+        {c.name} <button onClick={() => showOneCountry([c])}>Show</button>
+      </p>
+    ));
   }
   return <p>Too many matches. Specify another filter.</p>;
 };
@@ -26,11 +30,16 @@ const CountryInfo = ({ country }) => {
       <br />
       <h2>Languages</h2>
       <ul>
-        {country.languages.map((lan) => (
+        {country.languages.map(lan => (
           <li key={lan}>{lan}</li>
         ))}
       </ul>
-      {<img src={country.flag} width="200" />}
+      {
+        <img
+          src={country.flag}
+          width="200"
+        />
+      }
     </div>
   );
 };
@@ -44,13 +53,13 @@ const App = () => {
     console.log("Effect. Fetching all countries...");
     axios
       .get(`https://studies.cs.helsinki.fi/restcountries/api/all`)
-      .then((response) => {
+      .then(response => {
         // Turn the response data into more a more concise format
-        const data = response.data.map((c) => {
+        const data = response.data.map(c => {
           // Convert languages from an object to a list
-          // Some areas do not have have languages. Define these as empty list.
+          // Some areas do not have languages. Define these as empty list.
           const languages = c.languages
-            ? Object.values(c.languages).map((value) => value)
+            ? Object.values(c.languages).map(value => value)
             : [];
           // Put all necessary info in an object
           return {
@@ -68,16 +77,16 @@ const App = () => {
   }, []);
 
   /** Filter countries according to what the user has typed */
-  const filterCountries = (event) => {
+  const filterCountries = event => {
     const currentFilter = event.target.value;
     console.log("currentFilter:", currentFilter);
     setFilter(currentFilter);
     setFilteredCountries(
-      countries.filter((country) => {
+      countries.filter(country => {
         const lowerCaseCountry = country.name.toLowerCase();
         const lowerCaseFilter = currentFilter.toLowerCase();
         return lowerCaseCountry.includes(lowerCaseFilter);
-      })
+      }),
     );
   };
 
@@ -86,9 +95,16 @@ const App = () => {
   return (
     <div>
       <form>
-        Find countries: <input value={filter} onChange={filterCountries} />
+        Find countries:{" "}
+        <input
+          value={filter}
+          onChange={filterCountries}
+        />
       </form>
-      <Countries listOfCountries={filteredCountries} />
+      <Countries
+        listOfCountries={filteredCountries}
+        showOneCountry={setFilteredCountries}
+      />
     </div>
   );
 };
