@@ -41,15 +41,23 @@ app.delete("/api/persons/:id", (request, response) => {
 
 app.post("/api/persons", (request, response) => {
   const body = request.body;
-  //console.log("request:", request);
-  //console.log("body:", body);
+  // Check that number and name are included
+  if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: "content missing",
+    });
+  }
+  // Check that name does not already exist
+  const nameReserved = persons.find(p => p.name === body.name);
+  if (nameReserved) {
+    return response.status(409).json({ error: "name must be unique" });
+  }
 
   const person = {
     id: String(Math.floor(Math.random() * 10 ** 6)),
     name: body.name,
     number: body.number,
   };
-  //console.log("person", person);
 
   persons = persons.concat(person);
 
