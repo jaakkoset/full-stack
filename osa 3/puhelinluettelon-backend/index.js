@@ -3,7 +3,20 @@ const morgan = require("morgan");
 const app = express();
 
 app.use(express.json());
-app.use(morgan("tiny"));
+//app.use(morgan("tiny"));
+
+morgan.token("POST-body", request => {
+  if (request.method === "POST") {
+    return JSON.stringify(request.body);
+  }
+  return " ";
+});
+
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :POST-body",
+  ),
+);
 
 let persons = [
   { id: "1", name: "Arto Hellas", number: "040-123456" },
