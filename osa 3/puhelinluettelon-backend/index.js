@@ -21,44 +21,36 @@ app.use(
   ),
 );
 
-let persons = [
-  { id: "1", name: "Arto Hellas", number: "040-123456" },
-  { id: "2", name: "Ada Lovelace", number: "39-44-5323523" },
-  { id: "3", name: "Dan Abramov", number: "12-43-234345" },
-  { id: "4", name: "Mary Poppendieck", number: "39-23-6423122" },
-  { id: "5", name: "Dr. Livingstone", number: "+260-12-03-1873" },
-];
-
+/* View all persons in json format*/
 app.get("/api/persons", (request, response) => {
+  console.log("/api/persons");
   Person.find({}).then(persons => {
     response.json(persons);
   });
 });
 
+/* Get info about the phonebook */
 app.get("/info", (request, response) => {
   const time = new Date().toString();
-  const length = persons.length;
-  response.send("<p>Phonebook has info for " + length + " people</p>" + time);
+  Person.find({}).then(persons => {
+    const length = persons.length;
+    response.send("<p>Phonebook has info for " + length + " people</p>" + time);
+  });
 });
 
+/* View one person */
 app.get("/api/persons/:id", (request, response) => {
   const id = request.params.id;
-  const person = persons.find(person => person.id === id);
-  //console.log("person:", person);
-
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+  Person.findById(id).then(person => {
+    if (person) {
+      response.json(person);
+    } else {
+      response.status(404).end();
+    }
+  });
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  persons = persons.filter(person => person.id !== id);
-  response.status(204).end();
-});
-
+/* Add new a new person and a number */
 app.post("/api/persons", (request, response) => {
   const body = request.body;
   // Check that number and name are included
@@ -67,21 +59,15 @@ app.post("/api/persons", (request, response) => {
       error: "content missing",
     });
   }
-  // Check that name does not already exist
-  const nameReserved = persons.find(p => p.name === body.name);
-  if (nameReserved) {
-    return response.status(409).json({ error: "name must be unique" });
-  }
 
-  const person = {
-    id: String(Math.floor(Math.random() * 10 ** 6)),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = persons.concat(person);
-
-  response.json(persons);
+  person.save().then(savedPerson => {
+    response.json(savedPerson);
+  });
 });
 
 const PORT = process.env.PORT;
