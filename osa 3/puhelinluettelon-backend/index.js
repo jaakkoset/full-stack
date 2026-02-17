@@ -70,6 +70,18 @@ app.post("/api/persons", (request, response) => {
   });
 });
 
+/* Delete a person */
+app.delete("/api/persons/:id", (request, response) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then(result => {
+      response.status(204).end();
+    })
+    .catch(error => {
+      console.log("Deleting a person failed. Error message:", error);
+      response.status(500).end();
+    });
+});
+
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
