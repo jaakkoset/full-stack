@@ -89,10 +89,33 @@ app.post("/api/persons", (request, response) => {
 app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
     .then(result => {
-      response.status(204).end();
+      return response.status(204).end();
     })
     .catch(error => {
       console.log("Deleting a person resulted in an error.");
+      next(error);
+    });
+});
+
+/* Update a number */
+app.put("/api/persons/:id", (request, response, next) => {
+  const { name, number } = request.body;
+
+  Person.findById(request.params.id)
+    .then(person => {
+      if (!person) {
+        return response.status(404).end();
+      }
+
+      person.name = name;
+      person.number = number;
+
+      return person.save().then(updatedPerson => {
+        response.json(updatedPerson);
+      });
+    })
+    .catch(error => {
+      console.log("Updating number resulted in an error");
       next(error);
     });
 });
