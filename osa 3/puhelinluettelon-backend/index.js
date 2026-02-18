@@ -60,14 +60,9 @@ app.get("/api/persons/:id", (request, response, next) => {
 });
 
 /* Add new a new person and a number */
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
   // Check that number and name are included
-  if (!body.name || !body.number) {
-    return response.status(400).json({
-      error: "content missing",
-    });
-  }
 
   const person = new Person({
     name: body.name,
@@ -121,10 +116,14 @@ app.put("/api/persons/:id", (request, response, next) => {
 });
 
 const errorHandler = (error, request, response, next) => {
+  console.log("------ error.message ------");
   console.error(error.message);
+  console.log("---------------------------");
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
