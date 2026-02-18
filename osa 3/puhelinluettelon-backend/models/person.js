@@ -16,10 +16,21 @@ mongoose
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
-    minlength: 3,
     required: true,
+    minlength: 3,
   },
-  number: { type: String, required: true },
+  number: {
+    type: String,
+    required: true,
+    minlength: 8,
+    validate: {
+      validator: function (v) {
+        return /^\d{2,3}-\d+$/.test(v);
+      },
+      message: props =>
+        `Phone numbers must start with 2 or 3 numbers followed by a '-' and more numbers. E.g. 12-1234567`,
+    },
+  },
 });
 
 personSchema.set("toJSON", {
