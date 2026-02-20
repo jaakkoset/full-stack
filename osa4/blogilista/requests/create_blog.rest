@@ -1,0 +1,10 @@
+
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Ovatko JavaScriptin sulkeet merkki sisäänrakennetusta militarismista?",
+  "author": "Paavo Pasifisti",
+  "url": "https://parhaat-blogit.fi/69",
+  "likes": 1010
+}
