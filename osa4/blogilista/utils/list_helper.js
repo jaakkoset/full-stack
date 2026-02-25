@@ -17,8 +17,39 @@ const favoriteBlog = blogs => {
   }, blogs[0])
 }
 
+const mostBlogs = blogs => {
+  if (blogs.length === 0) {
+    return null
+  }
+  const blogsPerAuthor = blogs.reduce(
+    (iterable, blog) => {
+      // number of blogs by the current author
+      const numberOfBlogs = iterable.authors[blog.author]
+      if (numberOfBlogs) {
+        iterable.authors[blog.author]++
+        const newNumberOfBlogs = iterable.authors[blog.author]
+        if (newNumberOfBlogs > iterable.mostSoFar.blogs) {
+          // Update the author with the most blogs so far
+          iterable.mostSoFar.author = blog.author
+          iterable.mostSoFar.blogs = newNumberOfBlogs
+        }
+      } else {
+        // This author is encountered for the first time
+        iterable.authors[blog.author] = 1
+      }
+      return iterable
+    },
+    { authors: {}, mostSoFar: { author: blogs[0].author, blogs: 1 } },
+  )
+
+  //console.log('blogsPerAuthor:', blogsPerAuthor)
+  //console.log('blogsPerAuthor.mostSoFar:', blogsPerAuthor.mostSoFar)
+  return blogsPerAuthor.mostSoFar
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
+  mostBlogs,
 }
