@@ -19,6 +19,22 @@ const manyBlogs = [
     __v: 0,
   },
   {
+    _id: '5a422b891b54a676234d17fa',
+    title: 'First class tests',
+    author: 'Robert C. Martin',
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+    likes: 10,
+    __v: 0,
+  },
+  {
+    _id: '1a422bc61b54a676234d17fc',
+    title: 'Hello World!',
+    author: 'Manfred Mankind',
+    url: 'http://hello.world',
+    likes: 0,
+    __v: 0,
+  },
+  {
     _id: '5a422aa71b54a676234d17f8',
     title: 'Go To Statement Considered Harmful',
     author: 'Edsger W. Dijkstra',
@@ -32,14 +48,6 @@ const manyBlogs = [
     author: 'Edsger W. Dijkstra',
     url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
     likes: 12,
-    __v: 0,
-  },
-  {
-    _id: '5a422b891b54a676234d17fa',
-    title: 'First class tests',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
-    likes: 10,
     __v: 0,
   },
   {

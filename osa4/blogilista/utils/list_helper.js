@@ -1,3 +1,5 @@
+const lodash = require('lodash')
+
 const dummy = blogs => {
   return 1
 }
@@ -17,6 +19,7 @@ const favoriteBlog = blogs => {
   }, blogs[0])
 }
 
+/* Returns the author with the highest total number of blogs */
 const mostBlogs = blogs => {
   if (blogs.length === 0) {
     return null
@@ -47,9 +50,30 @@ const mostBlogs = blogs => {
   return blogsPerAuthor.mostSoFar
 }
 
+/* Returns the author with the highest total number of likes across all blogs */
+const mostLikes = blogs => {
+  //console.log('blogs:', blogs)
+  if (blogs.length === 0) {
+    return null
+  }
+  const grouped = lodash(blogs).groupBy('author')
+  const summed = grouped.map((blogs, author) => {
+    //console.log(`blogs of ${author}:`, blogs)
+    return {
+      author: author,
+      totalLikes: lodash.sumBy(blogs, 'likes'),
+    }
+  })
+  //console.log('summed:', summed)
+  const max = summed.maxBy('totalLikes')
+  //console.log('max:', max)
+  return max
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
+  mostLikes,
 }
