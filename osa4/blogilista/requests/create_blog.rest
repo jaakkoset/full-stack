@@ -3,7 +3,7 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-  "title": "Koodaus on kivaa",
+  "title": "Voiko suomalainen käyttää Pythonia vaikka se ei ole kotoperäinen laji?",
   "author": "Kalle Koodari",
   "url": "https://parhaat-blogit.fi/100",
   "likes": 1
