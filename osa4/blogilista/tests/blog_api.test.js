@@ -71,6 +71,22 @@ test('number of likes defaults to zero', async () => {
   assert.strictEqual(addedBlog['likes'], 0)
 })
 
+test('adding a blog without a title returns 400', async () => {
+  const blog = {
+    author: 'Ben Blogger',
+    url: 'https://parhaat-blogit.fi/209833',
+  }
+  await api.post('/api/blogs').send(blog).expect(400)
+})
+
+test('adding a blog without an url returns 400', async () => {
+  const blog = {
+    author: 'Ben Blogger',
+    title: 'No URL',
+  }
+  await api.post('/api/blogs').send(blog).expect(400)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
