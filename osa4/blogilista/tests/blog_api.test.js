@@ -58,6 +58,19 @@ test('blogs can be added', async () => {
   assert.strictEqual(addedBlog['title'], blogTitle)
 })
 
+test('number of likes defaults to zero', async () => {
+  const blogTitle = 'This blog has no likes'
+  const blog = {
+    title: blogTitle,
+    author: 'Ben Blogger',
+    url: 'https://parhaat-blogit.fi/092834',
+  }
+  await api.post('/api/blogs').send(blog)
+  let addedBlog = await testHelper.getBlogs()
+  addedBlog = addedBlog.find(b => b.title === blogTitle)
+  assert.strictEqual(addedBlog['likes'], 0)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
