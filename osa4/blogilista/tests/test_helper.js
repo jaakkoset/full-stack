@@ -75,4 +75,9 @@ const getBlogs = async () => {
   return blogs.map(b => b.toJSON())
 }
 
-module.exports = { oneBlog, manyBlogs, getBlogs }
+const blogsInDb = async () => {
+  const blogs = await Blog.find({})
+  return blogs.map(b => b.toJSON())
+}
+
+module.exports = { oneBlog, manyBlogs, getBlogs, blogsInDb }
