@@ -109,6 +109,17 @@ describe('When some blogs are initially saved', () => {
       assert.strictEqual(blogsAfter.length, blogsBefore.length - 1)
     })
   })
+
+  test('updating the number of likes succeeds', async () => {
+    const blogsBefore = await testHelper.blogsInDb()
+    const blogToUpdate = blogsBefore[0]
+    const requestBody = { likes: 50 }
+    await api.put(`/api/blogs/${blogToUpdate.id}`).send(requestBody).expect(200)
+
+    const blogsAfter = await testHelper.blogsInDb()
+    const updatedBlog = blogsAfter.find(b => b.id === blogToUpdate.id)
+    assert.strictEqual(updatedBlog.likes, requestBody.likes)
+  })
 })
 
 after(async () => {
