@@ -9,6 +9,9 @@ morgan.token('POST-body', request => {
 
 const requestLogger = morgan(
   ':method :url :status :res[content-length] - :response-time ms :POST-body',
+  {
+    skip: () => process.env.NODE_ENV === 'test',
+  },
 )
 
 module.exports = { requestLogger }
