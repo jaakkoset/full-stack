@@ -30,10 +30,32 @@ test('all blogs are returned', async () => {
 
 test('returned blogs include an id field', async () => {
   const response = await api.get('/api/blogs')
-  console.log('--- response.body ---')
-  console.log(response.body[0].id)
-  console.log('--- END ---')
   assert.ok('id' in response.body[0], 'a blog includes an id field')
+})
+
+test('blogs can be added', async () => {
+  const blogTitle = 'A new blog'
+  const blog = {
+    title: blogTitle,
+    author: 'Edsger W. Dijkstra',
+    url: 'http://www.helsinki.fi/blogs/a_new_blog',
+    likes: 11,
+  }
+
+  // Add a new blog
+  await api
+    .post('/api/blogs')
+    .send(blog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  // Check that the number of blogs has increased by one
+  const blogs = await testHelper.getBlogs()
+  assert.strictEqual(blogs.length, initialBlogs.length + 1)
+
+  // Check that the added title is in the database
+  const addedBlog = blogs.find(b => b.title === blogTitle)
+  assert.strictEqual(addedBlog['title'], blogTitle)
 })
 
 after(async () => {
