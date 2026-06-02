@@ -8,7 +8,6 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   if (!request.body.title || !request.body.url) {
-    console.log('No title!')
     return response.status(400).end()
   }
   const blog = new Blog(request.body)
