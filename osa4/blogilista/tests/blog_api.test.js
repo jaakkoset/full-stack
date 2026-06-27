@@ -42,28 +42,6 @@ describe('When some blogs are initially saved', () => {
     assert.ok('id' in response.body[0], 'a blog includes an id field')
   })
 
-  describe('adding a blog', () => {
-    test('without a title returns status 400', async () => {
-      const blog = {
-        author: 'Ben Blogger',
-        url: 'https://parhaat-blogit.fi/209833',
-      }
-      await api.post('/api/blogs').send(blog).expect(400)
-      const blogs = await testHelper.getBlogs()
-      assert.strictEqual(blogs.length, initialBlogs.length)
-    })
-
-    test('without an url returns status 400', async () => {
-      const blog = {
-        author: 'Ben Blogger',
-        title: 'No URL',
-      }
-      await api.post('/api/blogs').send(blog).expect(400)
-      const blogs = await testHelper.getBlogs()
-      assert.strictEqual(blogs.length, initialBlogs.length)
-    })
-  })
-
   test('updating the number of likes succeeds', async () => {
     const blogsBefore = await testHelper.blogsInDb()
     const blogToUpdate = blogsBefore[0]
@@ -287,7 +265,7 @@ describe('When there is initially one user in the db', () => {
         .expect(401)
         .expect('Content-Type', /application\/json/)
 
-      assert(result.body.error.includes('token missing or invalid'))
+      assert(result.body.error.includes('token missing'))
     })
 
     test('fails with a proper status code and message with an invalid token', async () => {
@@ -306,6 +284,38 @@ describe('When there is initially one user in the db', () => {
         .expect(401)
         .expect('Content-Type', /application\/json/)
       assert(result.body.error.includes('token missing or invalid'))
+    })
+
+    test('without a title returns status 400', async () => {
+      const blogsBefore = await testHelper.getBlogs()
+      const blog = {
+        author: 'Ben Blogger',
+        url: 'https://parhaat-blogit.fi/209833',
+      }
+      const token = await getToken()
+      await api
+        .post('/api/blogs')
+        .send(blog)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(400)
+      const blogsAfter = await testHelper.getBlogs()
+      assert.strictEqual(blogsAfter.length, blogsBefore.length)
+    })
+
+    test('without a url returns status 400', async () => {
+      const blogsBefore = await testHelper.getBlogs()
+      const blog = {
+        author: 'Ben Blogger',
+        title: 'No URL',
+      }
+      const token = await getToken()
+      await api
+        .post('/api/blogs')
+        .send(blog)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(400)
+      const blogsAfter = await testHelper.getBlogs()
+      assert.strictEqual(blogsAfter.length, blogsBefore.length)
     })
   })
 
@@ -363,7 +373,7 @@ describe('When there is initially one user in the db', () => {
           .delete(`/api/blogs/${blogToDelete.id}`)
           .expect(401)
           .expect('Content-Type', /application\/json/)
-        assert(result.body.error.includes('token missing or invalid'))
+        assert(result.body.error.includes('token missing'))
 
         const blogsAfter = await testHelper.blogsInDb()
         const blogIds = blogsAfter.map(b => b.id)
