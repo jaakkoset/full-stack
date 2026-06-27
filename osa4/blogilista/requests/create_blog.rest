@@ -1,10 +1,11 @@
 
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaWQiOiI2YTNmYWQ3NDI1NzQ5OTYxMjU1MjYzMzUiLCJpYXQiOjE3ODI1NTkxOTB9.Zf4HB1cAM-6VfMM08QIh8p8JcOEB9BtJkBP9LPULO1c
 
 {
   "title": "Voiko suomalainen käyttää Pythonia vaikka se ei ole kotoperäinen laji?",
   "author": "Kalle Koodari",
   "url": "https://parhaat-blogit.fi/100",
-  "likes": 1
+  "likes": 0
 }

@@ -12,6 +12,12 @@ const api = supertest(app)
 
 const initialBlogs = testHelper.manyBlogs
 
+const getToken = async (username = 'user1', password = 'sekret') => {
+  /* Gets the token of the user */
+  const response = await api.post('/api/login').send({ username, password })
+  return response.body.token
+}
+
 describe('When some blogs are initially saved', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
@@ -37,44 +43,6 @@ describe('When some blogs are initially saved', () => {
   })
 
   describe('adding a blog', () => {
-    test('succeeds with valid inputs', async () => {
-      const blogTitle = 'A new blog'
-      const blog = {
-        title: blogTitle,
-        author: 'Edsger W. Dijkstra',
-        url: 'http://www.helsinki.fi/blogs/a_new_blog',
-        likes: 11,
-      }
-
-      // Add a new blog
-      await api
-        .post('/api/blogs')
-        .send(blog)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
-
-      // Check that the number of blogs has increased by one
-      const blogs = await testHelper.getBlogs()
-      assert.strictEqual(blogs.length, initialBlogs.length + 1)
-
-      // Check that the added title is in the database
-      const addedBlog = blogs.find(b => b.title === blogTitle)
-      assert.strictEqual(addedBlog['title'], blogTitle)
-    })
-
-    test('is done by default with zero likes', async () => {
-      const blogTitle = 'This blog has no likes'
-      const blog = {
-        title: blogTitle,
-        author: 'Ben Blogger',
-        url: 'https://parhaat-blogit.fi/092834',
-      }
-      await api.post('/api/blogs').send(blog)
-      let addedBlog = await testHelper.getBlogs()
-      addedBlog = addedBlog.find(b => b.title === blogTitle)
-      assert.strictEqual(addedBlog['likes'], 0)
-    })
-
     test('without a title returns status 400', async () => {
       const blog = {
         author: 'Ben Blogger',
@@ -267,6 +235,105 @@ describe('When there is initially one user in the db', () => {
 
     const usersAtEnd = await testHelper.usersInDb()
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+})
+
+describe('When some blogs and a user are initially in the db', () => {
+  beforeEach(async () => {
+    // Save blogs
+    await Blog.deleteMany({})
+    await Blog.insertMany(initialBlogs)
+    // Save a user
+    await User.deleteMany({})
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({
+      username: 'user1',
+      name: 'Pelle Peloton',
+      passwordHash,
+    })
+    await user.save()
+  })
+
+  describe('adding a blog', () => {
+    test('succeeds with valid inputs', async () => {
+      // Get the token
+      const token = await getToken()
+
+      // Create blog content
+      const blogTitle = 'A new blog'
+      const blog = {
+        title: blogTitle,
+        author: 'Edsger W. Dijkstra',
+        url: 'http://www.helsinki.fi/blogs/a_new_blog',
+      }
+
+      // Add the new blog
+      await api
+        .post('/api/blogs')
+        .send(blog)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      // Check that the number of blogs has increased by one
+      const blogs = await testHelper.getBlogs()
+      assert.strictEqual(blogs.length, initialBlogs.length + 1)
+
+      // Check that the added title is in the database
+      const addedBlog = blogs.find(b => b.title === blogTitle)
+      assert.strictEqual(addedBlog['title'], blogTitle)
+    })
+
+    test('is done by default with zero likes', async () => {
+      const token = await getToken()
+      const blogTitle = 'This blog has no likes'
+      const blog = {
+        title: blogTitle,
+        author: 'Ben Blogger',
+        url: 'https://parhaat-blogit.fi/092834',
+      }
+      await api
+        .post('/api/blogs')
+        .send(blog)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(201)
+      let addedBlog = await testHelper.getBlogs()
+      addedBlog = addedBlog.find(b => b.title === blogTitle)
+      assert.strictEqual(addedBlog['likes'], 0)
+    })
+
+    test('fails with a proper status code and message without a token', async () => {
+      const blog = {
+        title: 'A new blog',
+        author: 'Edsger W. Dijkstra',
+        url: 'http://www.helsinki.fi/blogs/a_new_blog',
+      }
+      const result = await api
+        .post('/api/blogs')
+        .send(blog)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+      assert(result.body.error.includes('token missing or invalid'))
+    })
+
+    test('fails with a proper status code and message with an invalid token', async () => {
+      const blog = {
+        title: 'A new blog',
+        author: 'Edsger W. Dijkstra',
+        url: 'http://www.helsinki.fi/blogs/a_new_blog',
+      }
+      let token = await getToken()
+      // Break the token
+      token = 'oops' + token.slice(4)
+      const result = await api
+        .post('/api/blogs')
+        .send(blog)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+      assert(result.body.error.includes('token missing or invalid'))
+    })
   })
 })
 
