@@ -101,6 +101,25 @@ const App = () => {
     )
   }
 
+  const deleteBlog = async blogObject => {
+    try {
+      if (
+        window.confirm(
+          `Remove blog "${blogObject.title}" by ${blogObject.author}`,
+        )
+      ) {
+        await blogService.deleteBlog(blogObject.id)
+        const updatedBlogs = blogs.filter(b => b.id !== blogObject.id)
+        setBlogsAccordingToLikes(updatedBlogs)
+        displayNotification(
+          `Blog "${blogObject.title}" by ${blogObject.author} removed`,
+        )
+      }
+    } catch (error) {
+      displayNotification(`Something went wrong. ${error.message}`, 'error')
+    }
+  }
+
   return (
     <div>
       <h2>blogs</h2>
@@ -144,6 +163,8 @@ const App = () => {
             key={blog.id}
             blog={blog}
             handleLike={likeBlog}
+            handleDelete={deleteBlog}
+            currentUser={user}
           />
         ))}
     </div>
