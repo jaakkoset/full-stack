@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleLike }) => {
   const [showAll, setShowAll] = useState(false)
 
   const extraInfo = { display: showAll ? '' : 'none' }
@@ -29,9 +29,7 @@ const Blog = ({ blog }) => {
         {blog.url}
         <br />
         Likes {blog.likes}{' '}
-        <button onClick={() => console.log(`Liked "${blog.title}"`)}>
-          Like
-        </button>
+        <button onClick={() => handleLike(blog)}>Like</button>
         <br />
         {blog.user.name}
       </div>

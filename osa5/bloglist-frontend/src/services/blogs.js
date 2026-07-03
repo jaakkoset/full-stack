@@ -1,4 +1,5 @@
 import axios from 'axios'
+
 const baseUrl = '/api/blogs'
 
 let token = null
@@ -21,4 +22,10 @@ const create = async blogObject => {
   return response.data
 }
 
-export default { getAll, create, setToken }
+const update = async (blogObject, blogId) => {
+  const url = `${baseUrl}/${blogId}`
+  const response = await axios.put(url, blogObject)
+  return response.data
+}
+
+export default { getAll, create, setToken, update }
