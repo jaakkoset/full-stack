@@ -19,7 +19,7 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs => setBlogs(blogs))
+    blogService.getAll().then(blogs => setBlogsAccordingToLikes(blogs))
   }, [])
 
   useEffect(() => {
@@ -31,6 +31,10 @@ const App = () => {
     }
   }, [])
 
+  const setBlogsAccordingToLikes = blogs => {
+    const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
+    setBlogs(sortedBlogs)
+  }
   const displayNotification = (message, type = 'success') => {
     setNotificationMessage(message)
     setNotificationType(type)
@@ -72,7 +76,7 @@ const App = () => {
       }
       const response = await blogService.create(blogObject)
       const newBlogWithUser = { ...response, user }
-      setBlogs(blogs.concat(newBlogWithUser))
+      setBlogsAccordingToLikes(blogs.concat(newBlogWithUser))
       displayNotification(
         `A new blog "${response.title}" by ${response.author} added`,
       )
@@ -92,7 +96,9 @@ const App = () => {
     }
     const response = await blogService.update(likedBlog, blog.id)
     const updatedBlog = { ...response, user: blog.user }
-    setBlogs(blogs.map(b => (b.id === updatedBlog.id ? updatedBlog : b)))
+    setBlogsAccordingToLikes(
+      blogs.map(b => (b.id === updatedBlog.id ? updatedBlog : b)),
+    )
   }
 
   return (
