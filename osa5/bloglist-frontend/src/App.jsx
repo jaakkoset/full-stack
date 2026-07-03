@@ -71,7 +71,8 @@ const App = () => {
         url: url,
       }
       const response = await blogService.create(blogObject)
-      setBlogs(blogs.concat(response))
+      const newBlogWithUser = { ...response, user }
+      setBlogs(blogs.concat(newBlogWithUser))
       displayNotification(
         `A new blog "${response.title}" by ${response.author} added`,
       )
