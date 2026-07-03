@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Logout from './components/Logout'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -14,9 +15,8 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs => setBlogs(blogs))
@@ -63,9 +63,7 @@ const App = () => {
     displayNotification('You have been logged out')
   }
 
-  const addBlog = async event => {
-    event.preventDefault()
-
+  const addBlog = async (title, author, url) => {
     try {
       const blogObject = {
         title: title,
@@ -74,12 +72,10 @@ const App = () => {
       }
       const response = await blogService.create(blogObject)
       setBlogs(blogs.concat(response))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
       displayNotification(
         `A new blog "${response.title}" by ${response.author} added`,
       )
+      blogFormRef.current.toggleVisibility()
     } catch (error) {
       displayNotification(`No blog added. ${error.message}`, 'error')
     }
@@ -114,15 +110,12 @@ const App = () => {
       )}
 
       {user && (
-        <BlogForm
-          title={title}
-          author={author}
-          url={url}
-          handleTitleChange={({ target }) => setTitle(target.value)}
-          handleAuthorChange={({ target }) => setAuthor(target.value)}
-          handleUrlChange={({ target }) => setUrl(target.value)}
-          handleSubmit={addBlog}
-        />
+        <Togglable
+          buttonLabel="Create a new blog"
+          ref={blogFormRef}
+        >
+          <BlogForm handleSubmit={addBlog} />
+        </Togglable>
       )}
 
       {user &&
