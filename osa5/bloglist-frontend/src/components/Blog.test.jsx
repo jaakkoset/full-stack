@@ -1,14 +1,15 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
 describe('<Blog />', () => {
-  test('renders title and author', () => {
+  beforeEach(() => {
     const blog = {
       title: 'Blog title',
       author: 'Blog author',
       url: 'Blog url',
       likes: 0,
-      user: { username: 'user1' },
+      user: { username: 'user1', name: 'Firstname Lastname' },
     }
 
     const currentUser = {
@@ -24,37 +25,30 @@ describe('<Blog />', () => {
         currentUser={currentUser}
       />,
     )
+  })
 
+  test('renders title and author', () => {
     const element = screen.getByText('Blog title Blog author')
     expect(element).toBeVisible()
   })
 
   test('by default does not render url and likes', () => {
-    const blog = {
-      title: 'Blog title',
-      author: 'Blog author',
-      url: 'Blog url',
-      likes: 0,
-      user: { username: 'user1' },
-    }
-
-    const currentUser = {
-      username: 'user1',
-    }
-
-    render(
-      <Blog
-        key={1234}
-        blog={blog}
-        handleLike={'none'}
-        handleDelete={'none'}
-        currentUser={currentUser}
-      />,
-    )
-
     const likeElement = screen.getByText('Likes 0')
     expect(likeElement).not.toBeVisible()
     const urlElement = screen.getByText('Blog url')
     expect(urlElement).not.toBeVisible()
+  })
+
+  test('renders ulr, likes and user after pressing View button', async () => {
+    const user = userEvent.setup()
+    const button = screen.getByText('View')
+    await user.click(button)
+
+    const likeElement = screen.getByText('Likes 0')
+    expect(likeElement).toBeVisible()
+    const urlElement = screen.getByText('Blog url')
+    expect(urlElement).toBeVisible()
+    const userElement = screen.getByText('Firstname Lastname')
+    expect(userElement).toBeVisible()
   })
 })
