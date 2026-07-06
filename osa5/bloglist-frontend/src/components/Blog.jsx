@@ -30,13 +30,12 @@ const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
         <button onClick={toggleShowAll}>{buttonLabel}</button>
       </div>
       <div style={extraInfo}>
-        {blog.url}
-        <br />
-        Likes {blog.likes}{' '}
-        <button onClick={() => handleLike(blog)}>Like</button>
-        <br />
-        {blog.user.name}
-        <br />
+        <div>{blog.url}</div>
+        <div>
+          Likes {blog.likes}
+          <button onClick={() => handleLike(blog)}>Like</button>
+        </div>
+        <div>{blog.user.name}</div>
         <div style={showRemoveButton}>
           <button onClick={() => handleDelete(blog)}>Remove</button>
         </div>
