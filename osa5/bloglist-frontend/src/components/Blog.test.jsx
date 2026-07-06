@@ -52,3 +52,35 @@ describe('<Blog />', () => {
     expect(userElement).toBeVisible()
   })
 })
+
+describe('Clikcing', () => {
+  test('Like twice calls handleLike twice', async () => {
+    const blog = {
+      title: 'Blog title',
+      author: 'Blog author',
+      url: 'Blog url',
+      likes: 0,
+      user: { username: 'user1', name: 'Firstname Lastname' },
+    }
+    const currentUser = {
+      username: 'user1',
+    }
+    const mockLikeHandler = vi.fn()
+
+    render(
+      <Blog
+        key={1234}
+        blog={blog}
+        handleLike={mockLikeHandler}
+        handleDelete={'none'}
+        currentUser={currentUser}
+      />,
+    )
+
+    const user = userEvent.setup()
+    const LikeButton = screen.getByText('Like')
+    await user.click(LikeButton)
+    await user.click(LikeButton)
+    expect(mockLikeHandler.mock.calls).toHaveLength(2)
+  })
+})
