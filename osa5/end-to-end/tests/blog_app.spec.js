@@ -64,11 +64,29 @@ describe('Blog app', () => {
         )
       })
 
-      test.only('user can like the blog', async ({ page }) => {
+      test('user can like the blog', async ({ page }) => {
         await page.getByRole('button', { name: 'View' }).click()
         await expect(page.getByText('Likes 0')).toBeVisible()
         await page.getByRole('button', { name: 'Like' }).click()
         await expect(page.getByText('Likes 1')).toBeVisible()
+      })
+
+      test('user can delete the blog', async ({ page }) => {
+        const addedBlog = 'A blog added by playwright Author-name'
+        await expect(page.getByText(addedBlog)).toBeVisible()
+
+        await await page.getByRole('button', { name: 'View' }).click()
+        // Accept window.confirm
+        page.on('dialog', dialog => dialog.accept())
+        await page.getByRole('button', { name: 'Remove' }).click()
+
+        const message = page.getByText(
+          'Blog "A blog added by playwright" by Author-name removed',
+        )
+        // Notification message is visible
+        await expect(message).toBeVisible()
+        // No blog found anymore
+        await expect(page.getByText(addedBlog)).toHaveCount(0)
       })
     })
   })
