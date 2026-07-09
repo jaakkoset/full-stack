@@ -37,12 +37,31 @@ describe('Blog app', () => {
     test('fails with wrong credentials', async ({ page }) => {
       await page.getByLabel('username').fill('mluukkai')
       await page.getByLabel('password').fill('wrong')
-
       await page.getByRole('button', { name: 'login' }).click()
 
       const errorMessage = page.getByText('Wrong username or password')
       await expect(errorMessage).toBeVisible()
       await expect(errorMessage).toHaveCSS('color', 'rgb(255, 0, 0)')
+    })
+  })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await page.getByLabel('username').fill('mluukkai')
+      await page.getByLabel('password').fill('salainen')
+      await page.getByRole('button', { name: 'login' }).click()
+    })
+
+    test('a new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'Create a new blog' }).click()
+      await page.getByLabel('title').fill('A blog added by playwright')
+      await page.getByLabel('author').fill('Author-name')
+      await page.getByLabel('url').fill('url')
+      await page.getByRole('button', { name: 'create' }).click()
+
+      await expect(
+        page.getByText('A blog added by playwright Author-name'),
+      ).toBeVisible()
     })
   })
 })
