@@ -88,6 +88,37 @@ describe('Blog app', () => {
         // No blog found anymore
         await expect(page.getByText(addedBlog)).toHaveCount(0)
       })
+
+      test('another user cannot see the remove button of the blog', async ({
+        page,
+        request,
+      }) => {
+        // Create a new user
+        await request.post('http://localhost:3003/api/users', {
+          data: {
+            name: 'Pelle Peloton',
+            username: 'pepe',
+            password: 'salainen',
+          },
+        })
+        // The user that added the blog can see the "Remove" button
+        await page.getByRole('button', { name: 'View' }).click()
+        await expect(page.getByRole('button', { name: 'Remove' })).toHaveCount(
+          1,
+        )
+        // Login as another user
+        await page.getByRole('button', { name: 'Logout' }).click()
+        await loginWith(page, 'pepe', 'salainen')
+        // Blog is still visible
+        await expect(
+          page.getByText('A blog added by playwright Author-name'),
+        ).toBeVisible()
+        // User cannot see the "Remove" button
+        await page.getByRole('button', { name: 'View' }).click()
+        await expect(page.getByRole('button', { name: 'Remove' })).toHaveCount(
+          0,
+        )
+      })
     })
   })
 })
