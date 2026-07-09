@@ -23,4 +23,26 @@ describe('Blog app', () => {
     await expect(passwordTextbox).toBeVisible()
     await expect(loginButton).toBeVisible()
   })
+
+  describe('Login', () => {
+    test('succeeds with correct credentials', async ({ page }) => {
+      await page.getByLabel('username').fill('mluukkai')
+      await page.getByLabel('password').fill('salainen')
+
+      await page.getByRole('button', { name: 'login' }).click()
+
+      await expect(page.getByText('Matti Luukkainen logged in')).toBeVisible()
+    })
+
+    test('fails with wrong credentials', async ({ page }) => {
+      await page.getByLabel('username').fill('mluukkai')
+      await page.getByLabel('password').fill('wrong')
+
+      await page.getByRole('button', { name: 'login' }).click()
+
+      const errorMessage = page.getByText('Wrong username or password')
+      await expect(errorMessage).toBeVisible()
+      await expect(errorMessage).toHaveCSS('color', 'rgb(255, 0, 0)')
+    })
+  })
 })
