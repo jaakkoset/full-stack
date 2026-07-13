@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
@@ -12,11 +14,9 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationType, setNotificationType] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
-  const blogFormRef = useRef()
+  const togglableRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs => setBlogsAccordingToLikes(blogs))
@@ -44,19 +44,17 @@ const App = () => {
     }, 5000)
   }
 
-  const handleLogin = async event => {
-    event.preventDefault()
-
+  const handleLogin = async (username, password) => {
     try {
       const user = await loginService.login({ username, password })
 
       window.localStorage.setItem('loggedBlogListUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
+      return true
     } catch {
       displayNotification('Wrong username or password', 'error')
+      return false
     }
   }
 
@@ -80,7 +78,7 @@ const App = () => {
       displayNotification(
         `A new blog "${response.title}" by ${response.author} added`,
       )
-      blogFormRef.current.toggleVisibility()
+      togglableRef.current.toggleVisibility()
     } catch (error) {
       displayNotification(`No blog added. ${error.message}`, 'error')
     }
@@ -120,54 +118,77 @@ const App = () => {
     }
   }
 
+  const padding = { padding: 10 }
+
   return (
-    <div>
-      <h2>blogs</h2>
-
-      {notificationMessage && (
-        <Notification
-          message={notificationMessage}
-          type={notificationType}
-        />
-      )}
-
-      {!user && (
-        <LoginForm
-          username={username}
-          password={password}
-          handleUsernameChange={({ target }) => setUsername(target.value)}
-          handlePasswordChange={({ target }) => setPassword(target.value)}
-          handleSubmit={handleLogin}
-        />
-      )}
-
-      {user && (
-        <Logout
-          name={user.name}
-          handleClick={handleLogout}
-        />
-      )}
-
-      {user && (
-        <Togglable
-          buttonLabel="Create a new blog"
-          ref={blogFormRef}
+    <Router>
+      <div>
+        <Link
+          style={padding}
+          to="/"
         >
-          <BlogForm handleSubmit={addBlog} />
-        </Togglable>
-      )}
+          Home
+        </Link>
+        {!user && (
+          <Link
+            style={padding}
+            to="/login"
+          >
+            Login
+          </Link>
+        )}
+        {user && (
+          <button
+            style={padding}
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        )}
+      </div>
 
-      {user &&
-        blogs.map(blog => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            handleLike={likeBlog}
-            handleDelete={deleteBlog}
-            currentUser={user}
+      <div>
+        {notificationMessage && (
+          <Notification
+            message={notificationMessage}
+            type={notificationType}
           />
-        ))}
-    </div>
+        )}
+
+        {user && (
+          <div>
+            <p>{user.name} logged in</p>
+          </div>
+        )}
+
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <BlogList
+                blogs={blogs}
+                handleLike={likeBlog}
+                handleDelete={deleteBlog}
+                user={user}
+              />
+            }
+          />
+          <Route
+            path="/login"
+            element={<LoginForm handleLogin={handleLogin} />}
+          />
+        </Routes>
+
+        {user && (
+          <Togglable
+            buttonLabel="Create a new blog"
+            ref={togglableRef}
+          >
+            <BlogForm handleSubmit={addBlog} />
+          </Togglable>
+        )}
+      </div>
+    </Router>
   )
 }
 

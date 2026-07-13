@@ -3,7 +3,7 @@ import { useState } from 'react'
 const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
   const [showAll, setShowAll] = useState(false)
 
-  const extraInfo = { display: showAll ? '' : 'none' }
+  const showDropdown = { display: showAll ? '' : 'none' }
 
   const toggleShowAll = () => {
     setShowAll(!showAll)
@@ -11,9 +11,11 @@ const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
 
   const buttonLabel = showAll ? 'Hide' : 'View'
 
-  const showRemoveButton = {
-    display: blog.user.username === currentUser.username ? '' : 'none',
+  let style = 'none'
+  if (currentUser && blog.user.username === currentUser.username) {
+    style = ''
   }
+  const showRemoveButton = { display: style }
 
   const blogStyle = {
     paddingTop: 10,
@@ -29,7 +31,7 @@ const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
         {blog.title} {blog.author}{' '}
         <button onClick={toggleShowAll}>{buttonLabel}</button>
       </div>
-      <div style={extraInfo}>
+      <div style={showDropdown}>
         <div>{blog.url}</div>
         <div>
           Likes {blog.likes}
