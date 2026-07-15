@@ -1,17 +1,22 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import BlogForm from './BlogForm'
 
 describe('BlogForm', () => {
-  test('calls the callback hander with the correct info after clicking create', async () => {
+  test('calls the callback handler with the correct info after clicking create', async () => {
     const createBlog = vi.fn()
     const newBlog = {
       title: 'Blog title',
       author: 'Blog author',
       url: 'Blog url',
     }
-    render(<BlogForm handleSubmit={createBlog} />)
+    render(
+      <MemoryRouter>
+        <BlogForm handleCreate={createBlog} />
+      </MemoryRouter>,
+    )
 
     const user = userEvent.setup()
 
