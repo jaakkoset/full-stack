@@ -16,7 +16,7 @@ const App = () => {
   const [notificationType, setNotificationType] = useState(null)
   const [user, setUser] = useState(null)
 
-  const togglableRef = useRef()
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs => setBlogsAccordingToLikes(blogs))
@@ -78,7 +78,7 @@ const App = () => {
       displayNotification(
         `A new blog "${response.title}" by ${response.author} added`,
       )
-      togglableRef.current.toggleVisibility()
+      blogFormRef.current.toggleVisibility()
     } catch (error) {
       displayNotification(`No blog added. ${error.message}`, 'error')
     }
@@ -127,7 +127,7 @@ const App = () => {
           style={padding}
           to="/"
         >
-          Home
+          Blogs
         </Link>
         {!user && (
           <Link
@@ -177,12 +177,23 @@ const App = () => {
             path="/login"
             element={<LoginForm handleLogin={handleLogin} />}
           />
+          <Route
+            path="/blogs/:id"
+            element={
+              <Blog
+                blogs={blogs}
+                handleLike={likeBlog}
+                handleDelete={deleteBlog}
+                currentUser={user}
+              />
+            }
+          />
         </Routes>
 
         {user && (
           <Togglable
             buttonLabel="Create a new blog"
-            ref={togglableRef}
+            ref={blogFormRef}
           >
             <BlogForm handleSubmit={addBlog} />
           </Togglable>
