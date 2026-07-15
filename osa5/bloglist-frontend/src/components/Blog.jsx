@@ -1,12 +1,9 @@
 //import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
-const Blog = ({ blogs, handleLike, handleDelete, currentUser }) => {
+const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
   // const [showAll, setShowAll] = useState(false)
   const navigate = useNavigate()
-
-  const id = useParams().id
-  const blog = blogs.find(b => b.id === id)
 
   if (!blog) {
     return null

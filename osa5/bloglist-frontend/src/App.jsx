@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Routes, Route, Link, useMatch } from 'react-router-dom'
 import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
@@ -16,7 +16,7 @@ const App = () => {
   const [notificationType, setNotificationType] = useState(null)
   const [user, setUser] = useState(null)
 
-  const blogFormRef = useRef()
+  //const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs => setBlogsAccordingToLikes(blogs))
@@ -65,7 +65,7 @@ const App = () => {
     displayNotification('You have been logged out')
   }
 
-  const addBlog = async (title, author, url) => {
+  const createBlog = async (title, author, url) => {
     try {
       const blogObject = {
         title: title,
@@ -78,9 +78,11 @@ const App = () => {
       displayNotification(
         `A new blog "${response.title}" by ${response.author} added`,
       )
-      blogFormRef.current.toggleVisibility()
+      //blogFormRef.current.toggleVisibility()
+      return true
     } catch (error) {
       displayNotification(`No blog added. ${error.message}`, 'error')
+      return false
     }
   }
 
@@ -120,8 +122,11 @@ const App = () => {
 
   const padding = { padding: 10 }
 
+  const match = useMatch('/blogs/:id')
+  const blog = match ? blogs.find(b => b.id === match.params.id) : null
+
   return (
-    <Router>
+    <div>
       <div>
         <Link
           style={padding}
@@ -138,6 +143,14 @@ const App = () => {
           </Link>
         )}
         {user && (
+          <Link
+            style={padding}
+            to="/create"
+          >
+            New blog
+          </Link>
+        )}
+        {user && (
           <button
             style={padding}
             onClick={handleLogout}
@@ -147,59 +160,52 @@ const App = () => {
         )}
       </div>
 
-      <div>
-        {notificationMessage && (
-          <Notification
-            message={notificationMessage}
-            type={notificationType}
-          />
-        )}
+      {notificationMessage && (
+        <Notification
+          message={notificationMessage}
+          type={notificationType}
+        />
+      )}
 
-        {user && (
-          <div>
-            <p>{user.name} logged in</p>
-          </div>
-        )}
+      {user && (
+        <div>
+          <p>{user.name} logged in</p>
+        </div>
+      )}
 
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <BlogList
-                blogs={blogs}
-                handleLike={likeBlog}
-                handleDelete={deleteBlog}
-                user={user}
-              />
-            }
-          />
-          <Route
-            path="/login"
-            element={<LoginForm handleLogin={handleLogin} />}
-          />
-          <Route
-            path="/blogs/:id"
-            element={
-              <Blog
-                blogs={blogs}
-                handleLike={likeBlog}
-                handleDelete={deleteBlog}
-                currentUser={user}
-              />
-            }
-          />
-        </Routes>
-
-        {user && (
-          <Togglable
-            buttonLabel="Create a new blog"
-            ref={blogFormRef}
-          >
-            <BlogForm handleSubmit={addBlog} />
-          </Togglable>
-        )}
-      </div>
-    </Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <BlogList
+              blogs={blogs}
+              handleLike={likeBlog}
+              handleDelete={deleteBlog}
+              user={user}
+            />
+          }
+        />
+        <Route
+          path="/login"
+          element={<LoginForm handleLogin={handleLogin} />}
+        />
+        <Route
+          path="/blogs/:id"
+          element={
+            <Blog
+              blog={blog}
+              handleLike={likeBlog}
+              handleDelete={deleteBlog}
+              currentUser={user}
+            />
+          }
+        />
+        <Route
+          path="create"
+          element={<BlogForm handleCreate={createBlog} />}
+        />
+      </Routes>
+    </div>
   )
 }
 
