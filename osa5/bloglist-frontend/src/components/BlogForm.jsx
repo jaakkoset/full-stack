@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { TextField, Button } from '@mui/material'
 
 const BlogForm = ({ handleCreate }) => {
   const [title, setTitle] = useState('')
@@ -20,41 +21,46 @@ const BlogForm = ({ handleCreate }) => {
     }
   }
 
+  const style = { marginBottom: 10 }
+
   return (
     <div>
       <h2>Create a new blog</h2>
       <form onSubmit={addBlog}>
         <div>
-          <label>
-            title
-            <input
-              type="text"
-              value={title}
-              onChange={event => setTitle(event.target.value)}
-            />
-          </label>
+          <TextField
+            label="title"
+            type="text"
+            value={title}
+            onChange={event => setTitle(event.target.value)}
+            style={style}
+          />
         </div>
         <div>
-          <label>
-            author
-            <input
-              type="text"
-              value={author}
-              onChange={event => setAuthor(event.target.value)}
-            />
-          </label>
+          <TextField
+            label="author"
+            type="text"
+            value={author}
+            onChange={event => setAuthor(event.target.value)}
+            style={style}
+          />
         </div>
         <div>
-          <label>
-            url
-            <input
-              type="text"
-              value={url}
-              onChange={event => setUrl(event.target.value)}
-            />
-          </label>
+          <TextField
+            label="url"
+            type="text"
+            value={url}
+            onChange={event => setUrl(event.target.value)}
+            style={style}
+          />
         </div>
-        <button type="submit">create</button>
+        <Button
+          type="submit"
+          variant="contained"
+          style={style}
+        >
+          create
+        </Button>
       </form>
     </div>
   )

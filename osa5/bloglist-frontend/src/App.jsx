@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, Link, useMatch } from 'react-router-dom'
+import { Container } from '@mui/material'
 import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
@@ -126,86 +127,88 @@ const App = () => {
   const blog = match ? blogs.find(b => b.id === match.params.id) : null
 
   return (
-    <div>
+    <Container>
       <div>
-        <Link
-          style={padding}
-          to="/"
-        >
-          Blogs
-        </Link>
-        {!user && (
-          <Link
-            style={padding}
-            to="/login"
-          >
-            Login
-          </Link>
-        )}
-        {user && (
-          <Link
-            style={padding}
-            to="/create"
-          >
-            New blog
-          </Link>
-        )}
-        {user && (
-          <button
-            style={padding}
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
-        )}
-      </div>
-
-      {notificationMessage && (
-        <Notification
-          message={notificationMessage}
-          type={notificationType}
-        />
-      )}
-
-      {user && (
         <div>
-          <p>{user.name} logged in</p>
+          <Link
+            style={padding}
+            to="/"
+          >
+            Blogs
+          </Link>
+          {!user && (
+            <Link
+              style={padding}
+              to="/login"
+            >
+              Login
+            </Link>
+          )}
+          {user && (
+            <Link
+              style={padding}
+              to="/create"
+            >
+              New blog
+            </Link>
+          )}
+          {user && (
+            <button
+              style={padding}
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          )}
         </div>
-      )}
 
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <BlogList
-              blogs={blogs}
-              handleLike={likeBlog}
-              handleDelete={deleteBlog}
-              user={user}
-            />
-          }
-        />
-        <Route
-          path="/login"
-          element={<LoginForm handleLogin={handleLogin} />}
-        />
-        <Route
-          path="/blogs/:id"
-          element={
-            <Blog
-              blog={blog}
-              handleLike={likeBlog}
-              handleDelete={deleteBlog}
-              currentUser={user}
-            />
-          }
-        />
-        <Route
-          path="create"
-          element={<BlogForm handleCreate={createBlog} />}
-        />
-      </Routes>
-    </div>
+        {notificationMessage && (
+          <Notification
+            message={notificationMessage}
+            type={notificationType}
+          />
+        )}
+
+        {user && (
+          <div>
+            <p>{user.name} logged in</p>
+          </div>
+        )}
+
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <BlogList
+                blogs={blogs}
+                handleLike={likeBlog}
+                handleDelete={deleteBlog}
+                user={user}
+              />
+            }
+          />
+          <Route
+            path="/login"
+            element={<LoginForm handleLogin={handleLogin} />}
+          />
+          <Route
+            path="/blogs/:id"
+            element={
+              <Blog
+                blog={blog}
+                handleLike={likeBlog}
+                handleDelete={deleteBlog}
+                currentUser={user}
+              />
+            }
+          />
+          <Route
+            path="create"
+            element={<BlogForm handleCreate={createBlog} />}
+          />
+        </Routes>
+      </div>
+    </Container>
   )
 }
 

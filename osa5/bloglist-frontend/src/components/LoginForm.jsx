@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { TextField, Button } from '@mui/material'
 
 const LoginForm = ({ handleLogin }) => {
   const [username, setUsername] = useState('')
@@ -16,31 +17,36 @@ const LoginForm = ({ handleLogin }) => {
     setPassword('')
   }
 
+  const style = { marginBottom: 10 }
+
   return (
     <div>
       <h2>Log in to application</h2>
       <form onSubmit={login}>
         <div>
-          <label>
-            username
-            <input
-              type="text"
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </label>
+          <TextField
+            label="username"
+            value={username}
+            onChange={({ target }) => setUsername(target.value)}
+            style={style}
+          />
         </div>
         <div>
-          <label>
-            password
-            <input
-              type="password"
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </label>
+          <TextField
+            label="password"
+            type="password"
+            value={password}
+            onChange={({ target }) => setPassword(target.value)}
+            style={style}
+          />
         </div>
-        <button type="submit">login</button>
+        <Button
+          type="submit"
+          variant="contained"
+          style={style}
+        >
+          login
+        </Button>
       </form>
     </div>
   )
