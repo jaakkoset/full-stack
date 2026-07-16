@@ -17,8 +17,6 @@ const App = () => {
   const [notificationType, setNotificationType] = useState(null)
   const [user, setUser] = useState(null)
 
-  //const blogFormRef = useRef()
-
   useEffect(() => {
     blogService.getAll().then(blogs => setBlogsAccordingToLikes(blogs))
   }, [])
@@ -36,6 +34,7 @@ const App = () => {
     const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
     setBlogs(sortedBlogs)
   }
+
   const displayNotification = (message, type = 'success') => {
     setNotificationMessage(message)
     setNotificationType(type)
@@ -79,7 +78,6 @@ const App = () => {
       displayNotification(
         `A new blog "${response.title}" by ${response.author} added`,
       )
-      //blogFormRef.current.toggleVisibility()
       return true
     } catch (error) {
       displayNotification(`No blog added. ${error.message}`, 'error')
@@ -115,10 +113,13 @@ const App = () => {
         displayNotification(
           `Blog "${blogObject.title}" by ${blogObject.author} removed`,
         )
+        return true
       }
     } catch (error) {
       displayNotification(`Something went wrong. ${error.message}`, 'error')
+      return false
     }
+    return false
   }
 
   const style = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }

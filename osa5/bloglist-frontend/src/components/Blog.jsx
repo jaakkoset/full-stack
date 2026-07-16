@@ -1,16 +1,11 @@
-//import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
-  // const [showAll, setShowAll] = useState(false)
   const navigate = useNavigate()
 
   if (!blog) {
     return null
   }
-
-  // const buttonLabel = showAll ? 'Hide' : 'View'
-  // const showDropdown = { display: showAll ? '' : 'none' }
 
   let showRemoveButton = false
   if (currentUser && blog.user.username === currentUser.username) {
@@ -22,45 +17,47 @@ const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
     showLikeButton = true
   }
 
-  const deleteBlog = () => {
+  const deleteBlog = async event => {
     event.preventDefault()
-    handleDelete(blog)
-    navigate('/')
-  }
-
-  const blogStyle = {
-    paddingTop: 0,
-    paddingBottom: 10,
-    paddingLeft: 5,
-    border: 'solid',
-    borderWidth: 1,
-    marginTop: 20,
-    marginBottom: 5,
+    if (await handleDelete(blog)) {
+      navigate('/')
+    }
   }
 
   return (
-    <div style={blogStyle}>
-      <h3>
-        {blog.author}: {blog.title}
-      </h3>
-      {/* <div>
-        <button onClick={() => setShowAll(!showAll)}>{buttonLabel}</button>
-      </div>
-      <div style={showDropdown}> */}
+    <div className="blog">
+      <h3 className="title">{blog.title}</h3>
+      <div className="author">by {blog.author}</div>
       <div>
-        <a href={blog.url}>{blog.url}</a>
-        <div>
-          Likes {blog.likes}
+        <a
+          href={blog.url}
+          className="link"
+        >
+          {blog.url}
+        </a>
+
+        <div className="info-row">added by {blog.user.name}</div>
+        <div className="info-row">
+          <span style={{ fontWeight: '900', fontSize: '1.01rem' }}>
+            Likes {blog.likes}
+          </span>
           {showLikeButton && (
-            <button onClick={() => handleLike(blog)}>Like</button>
+            <button
+              className="like-button"
+              onClick={() => handleLike(blog)}
+            >
+              Like
+            </button>
+          )}
+          {showRemoveButton && (
+            <button
+              className="remove-button"
+              onClick={deleteBlog}
+            >
+              Remove
+            </button>
           )}
         </div>
-        <div>added by {blog.user.name}</div>
-        {showRemoveButton && (
-          <div>
-            <button onClick={deleteBlog}>Remove</button>
-          </div>
-        )}
       </div>
     </div>
   )
