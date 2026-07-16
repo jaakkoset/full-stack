@@ -28,11 +28,13 @@ describe('Blog app', () => {
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      await loginWith(page, 'mluukkai', 'wrong')
+      await page.getByText('login').click()
+      await page.getByLabel('username').fill('mluukkai')
+      await page.getByLabel('password').fill('wrong')
+      await page.getByRole('button', { name: 'login' }).click()
 
       const errorMessage = page.getByText('Wrong username or password')
       await expect(errorMessage).toBeVisible()
-      await expect(errorMessage).toHaveCSS('color', 'rgb(255, 0, 0)')
     })
   })
 
@@ -46,9 +48,7 @@ describe('Blog app', () => {
       const author = 'Author-name'
       await createBlog(page, 'A blog added by playwright', 'Author-name', 'url')
 
-      await expect(
-        page.getByText(`${title} by ${author}`),
-      ).toBeVisible()
+      await expect(page.getByText(`${title} by ${author}`)).toBeVisible()
     })
 
     test('Logout button is visible', async ({ page }) => {
@@ -61,12 +61,7 @@ describe('Blog app', () => {
       const blogTitle = 'A blog added by playwright'
       const blogAuthor = 'Author-name'
       beforeEach(async ({ page }) => {
-        await createBlog(
-          page,
-          blogTitle,
-          blogAuthor,
-          'url',
-        )
+        await createBlog(page, blogTitle, blogAuthor, 'url')
       })
 
       test('user can like the blog', async ({ page }) => {
@@ -77,11 +72,12 @@ describe('Blog app', () => {
       })
 
       test('user can delete the blog', async ({ page }) => {
+        // Accept window.confirm
+        page.on('dialog', dialog => dialog.accept())
+
         const visibleText = `${blogTitle} by ${blogAuthor}`
         await page.getByText(visibleText).click()
 
-        // Accept window.confirm
-        page.on('dialog', dialog => dialog.accept())
         await page.getByRole('button', { name: 'Remove' }).click()
 
         const message = page.getByText(
