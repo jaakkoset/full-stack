@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, Link, useMatch } from 'react-router-dom'
-import { Container } from '@mui/material'
+import { Container, AppBar, Toolbar, Button, Typography } from '@mui/material'
 import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
@@ -121,93 +121,109 @@ const App = () => {
     }
   }
 
-  const padding = { padding: 10 }
+  const style = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
 
   const match = useMatch('/blogs/:id')
   const blog = match ? blogs.find(b => b.id === match.params.id) : null
 
   return (
     <Container>
-      <div>
-        <div>
-          <Link
-            style={padding}
+      <AppBar position="static">
+        <Toolbar>
+          <Typography
+            variant="h6"
+            sx={{ flexGrow: 1, color: 'inherit', textDecoration: 'none' }}
+            component={Link}
             to="/"
           >
+            Blog App
+          </Typography>
+
+          <Button
+            color="inherit"
+            component={Link}
+            to="/"
+            sx={style}
+          >
             Blogs
-          </Link>
+          </Button>
           {!user && (
-            <Link
-              style={padding}
+            <Button
+              color="inherit"
+              component={Link}
               to="/login"
+              sx={style}
             >
               Login
-            </Link>
+            </Button>
           )}
           {user && (
-            <Link
-              style={padding}
+            <Button
+              color="inherit"
+              component={Link}
               to="/create"
+              sx={style}
             >
               New blog
-            </Link>
+            </Button>
           )}
           {user && (
-            <button
-              style={padding}
+            <Button
+              color="inherit"
               onClick={handleLogout}
+              sx={style}
             >
               Logout
-            </button>
+            </Button>
           )}
+        </Toolbar>
+      </AppBar>
+
+      {notificationMessage && (
+        <Notification
+          message={notificationMessage}
+          type={notificationType}
+        />
+      )}
+
+      {user && (
+        <div>
+          <p>{user.name} logged in</p>
         </div>
+      )}
 
-        {notificationMessage && (
-          <Notification
-            message={notificationMessage}
-            type={notificationType}
-          />
-        )}
-
-        {user && (
-          <div>
-            <p>{user.name} logged in</p>
-          </div>
-        )}
-
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <BlogList
-                blogs={blogs}
-                handleLike={likeBlog}
-                handleDelete={deleteBlog}
-                user={user}
-              />
-            }
-          />
-          <Route
-            path="/login"
-            element={<LoginForm handleLogin={handleLogin} />}
-          />
-          <Route
-            path="/blogs/:id"
-            element={
-              <Blog
-                blog={blog}
-                handleLike={likeBlog}
-                handleDelete={deleteBlog}
-                currentUser={user}
-              />
-            }
-          />
-          <Route
-            path="create"
-            element={<BlogForm handleCreate={createBlog} />}
-          />
-        </Routes>
-      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <BlogList
+              blogs={blogs}
+              handleLike={likeBlog}
+              handleDelete={deleteBlog}
+              user={user}
+            />
+          }
+        />
+        <Route
+          path="/login"
+          element={<LoginForm handleLogin={handleLogin} />}
+        />
+        <Route
+          path="/blogs/:id"
+          element={
+            <Blog
+              blog={blog}
+              handleLike={likeBlog}
+              handleDelete={deleteBlog}
+              currentUser={user}
+            />
+          }
+        />
+        <Route
+          path="create"
+          element={<BlogForm handleCreate={createBlog} />}
+        />
+      </Routes>
     </Container>
   )
 }
