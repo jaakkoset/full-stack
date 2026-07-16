@@ -9,7 +9,7 @@ const loginWith = async (page, username, password) => {
 }
 
 const createBlog = async (page, title, author, url) => {
-  await page.getByText('New blog').click()
+  await page.getByRole('link', { name: 'New blog' }).click()
   await page.getByLabel('title').fill(title)
   await page.getByLabel('author').fill(author)
   await page.getByLabel('url').fill(url)

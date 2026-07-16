@@ -114,5 +114,60 @@ describe('Blog app', () => {
         )
       })
     })
+
+    describe('and many blogs have been added', () => {
+      const blog0 = { title: 'Title0', author: 'Author0', url: 'url0' }
+      const blog1 = { title: 'Title1', author: 'Author1', url: 'url1' }
+      const blog2 = { title: 'Title2', author: 'Author2', url: 'url2' }
+      beforeEach(async ({ page }) => {
+        await createBlog(page, blog0.title, blog0.author, blog0.url)
+        await createBlog(page, blog1.title, blog1.author, blog1.url)
+        await createBlog(page, blog2.title, blog2.author, blog2.url)
+      })
+
+      test('blogs are arranged according to likes', async ({ page }) => {
+        // Check the original order is as expected
+        const originalOrder = [
+          'Title0 by Author0',
+          'Title1 by Author1',
+          'Title2 by Author2',
+        ]
+        const blogList = await page.locator('ul > li')
+        await expect(blogList).toHaveText(originalOrder)
+
+        // Like the second blog once
+        await page.getByRole('link', { name: blog1.title }).click()
+        await expect(page.getByText('Likes 0')).toBeVisible()
+        await page.getByRole('button', { name: 'Like' }).click()
+        await expect(page.getByText('Likes 1')).toBeVisible()
+
+        // Go to home page
+        await page.getByRole('link', { name: 'blogs' }).click()
+        // Check that the second blog is the topmost
+        const secondOrder = [
+          'Title1 by Author1',
+          'Title0 by Author0',
+          'Title2 by Author2',
+        ]
+        await expect(blogList).toHaveText(secondOrder)
+
+        // Like the first blog twice
+        await page.getByRole('link', { name: blog0.title }).click()
+        await expect(page.getByText('Likes 0')).toBeVisible()
+        await page.getByRole('button', { name: 'Like' }).click()
+        await page.getByRole('button', { name: 'Like' }).click()
+        await expect(page.getByText('Likes 2')).toBeVisible()
+
+        // Go to home page
+        await page.getByRole('link', { name: 'blogs' }).click()
+        // Check that the first blog is again the topmost
+        const thirdOrder = [
+          'Title0 by Author0',
+          'Title1 by Author1',
+          'Title2 by Author2',
+        ]
+        await expect(blogList).toHaveText(thirdOrder)
+      })
+    })
   })
 })
